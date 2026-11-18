@@ -52,3 +52,24 @@ Day-trading mode averages 18 round trips per signal.
 ## Not tested
 Position sizing, pyramiding, the Turtle "skip after a winning breakout" filter,
 shorts, other N/M values, ES/MES. The Pine's "video" result is unknown to us.
+
+## Sized run: $100,000 account, 5% risk per signal (added 2026-11-18)
+
+`scripts/size.py`. Contracts = floor(risk dollars / (initial stop distance x $2)),
+decided at the breakout candle from the indicator's modeled entry and stop.
+Whole-contract rounding means actual risk averaged 4.3% (compounding) or 3.8% (fixed $5,000).
+No costs. Files: `sized_*_5pct_{compound,fixed}.{csv,json}`.
+
+| run | sizing | contracts | ending equity | return | expectancy/signal | PF | max DD (closed trades) | worst loss | best win | net without best |
+|---|---|---|---|---|---|---|---|---|---|---|
+| day-trading, at level | 5% compounding | 2-6 | $125,384 | +25.4% | $846 | 1.43 | -$19,174 (-15.1%) | -$6,345 | +$19,678 | +$5,704 |
+| day-trading, at level | fixed $5,000 | 1-5 | $123,726 | +23.7% | $791 | 1.45 | -$19,189 (-15.5%) | -$5,076 | +$19,678 | +$4,047 |
+| pure, at level | 5% compounding | 2-6 | $125,791 | +25.8% | $860 | 1.43 | -$18,600 (-14.5%) | -$6,213 | +$19,520 | +$6,270 |
+| pure, at level | fixed $5,000 | 1-5 | $124,894 | +24.9% | $830 | 1.49 | -$16,394 (-13.2%) | -$4,970 | +$19,520 | +$5,374 |
+| day-trading, alert fills | 5% compounding | 2-6 | $122,126 | +22.1% | $738 | 1.39 | -$20,208 (-15.7%) | -$6,432 | +$20,620 | +$1,509 |
+| day-trading, alert fills | fixed $5,000 | 1-5 | $120,884 | +20.9% | $696 | 1.41 | -$20,960 (-16.7%) | -$5,764 | +$20,620 | +$265 |
+
+Roughly +25% over four years is about 5.8% a year compounded, against a 15%
+closed-trade drawdown. The drawdown is from the Aug 2025 to Jan 2026 stretch:
+five losers in six signals, each about -4% of equity. Max drawdown is measured on
+closed trades; open-trade drawdown is deeper by up to one stop distance.
