@@ -1,0 +1,155 @@
+{
+ "params": {
+  "csv": "mnq_30m_continuous.csv",
+  "out": "bt_pure_close",
+  "N": 20,
+  "M": 10,
+  "atr": 20,
+  "mult": 2.0,
+  "daytrading": 0,
+  "close": "16:30",
+  "open": "18:00",
+  "px": "adj",
+  "fill": "close",
+  "cost": 0.0
+ },
+ "bars": 88187,
+ "first_bar": "2019-05-05 18:00:00-04:00",
+ "last_bar": "2026-10-20 19:30:00-04:00",
+ "signals_usd": {
+  "n": 53,
+  "win_rate": 0.5660377358490566,
+  "avg_win": 1202.65,
+  "avg_loss": -1005.304347826087,
+  "expectancy": 244.4811320754717,
+  "total": 12957.5,
+  "profit_factor": 1.5603970244788512,
+  "max_drawdown": -5639.5,
+  "max_losing_streak": 4,
+  "max_winning_streak": 7
+ },
+ "segments_usd": {
+  "n": 53,
+  "win_rate": 0.5660377358490566,
+  "avg_win": 1202.65,
+  "avg_loss": -1005.304347826087,
+  "expectancy": 244.4811320754717,
+  "total": 12957.5,
+  "profit_factor": 1.5603970244788512,
+  "max_drawdown": -5639.5,
+  "max_losing_streak": 4,
+  "max_winning_streak": 7
+ },
+ "by_year_usd": {
+  "2019": {
+   "n": 4,
+   "win_rate": 0.75,
+   "avg_win": 471.3333333333333,
+   "avg_loss": -191.5,
+   "expectancy": 305.625,
+   "total": 1222.5,
+   "profit_factor": 7.383812010443864,
+   "max_drawdown": -191.5,
+   "max_losing_streak": 1,
+   "max_winning_streak": 2
+  },
+  "2020": {
+   "n": 8,
+   "win_rate": 0.75,
+   "avg_win": 721.6666666666666,
+   "avg_loss": -777.25,
+   "expectancy": 346.9375,
+   "total": 2775.5,
+   "profit_factor": 2.7854615632036026,
+   "max_drawdown": -1554.5,
+   "max_losing_streak": 2,
+   "max_winning_streak": 5
+  },
+  "2021": {
+   "n": 7,
+   "win_rate": 0.5714285714285714,
+   "avg_win": 1028.125,
+   "avg_loss": -657.8333333333334,
+   "expectancy": 305.57142857142856,
+   "total": 2139.0,
+   "profit_factor": 2.083861160374968,
+   "max_drawdown": -1345.0,
+   "max_losing_streak": 1,
+   "max_winning_streak": 2
+  },
+  "2022": {
+   "n": 7,
+   "win_rate": 0.2857142857142857,
+   "avg_win": 759.0,
+   "avg_loss": -1162.5,
+   "expectancy": -613.5,
+   "total": -4294.5,
+   "profit_factor": 0.2611612903225806,
+   "max_drawdown": -4381.5,
+   "max_losing_streak": 4,
+   "max_winning_streak": 1
+  },
+  "2023": {
+   "n": 6,
+   "win_rate": 0.8333333333333334,
+   "avg_win": 1380.8,
+   "avg_loss": -989.5,
+   "expectancy": 985.75,
+   "total": 5914.5,
+   "profit_factor": 6.977261243052046,
+   "max_drawdown": -989.5,
+   "max_losing_streak": 1,
+   "max_winning_streak": 3
+  },
+  "2024": {
+   "n": 9,
+   "win_rate": 0.5555555555555556,
+   "avg_win": 762.2,
+   "avg_loss": -1041.25,
+   "expectancy": -39.333333333333336,
+   "total": -354.0,
+   "profit_factor": 0.9150060024009604,
+   "max_drawdown": -2540.0,
+   "max_losing_streak": 2,
+   "max_winning_streak": 2
+  },
+  "2025": {
+   "n": 7,
+   "win_rate": 0.42857142857142855,
+   "avg_win": 1571.3333333333333,
+   "avg_loss": -1042.125,
+   "expectancy": 77.92857142857143,
+   "total": 545.5,
+   "profit_factor": 1.1308624205349647,
+   "max_drawdown": -2285.0,
+   "max_losing_streak": 2,
+   "max_winning_streak": 2
+  },
+  "2026": {
+   "n": 5,
+   "win_rate": 0.4,
+   "avg_win": 4638.0,
+   "avg_loss": -1422.3333333333333,
+   "expectancy": 1001.8,
+   "total": 5009.0,
+   "profit_factor": 2.1738926646355754,
+   "max_drawdown": -1659.5,
+   "max_losing_streak": 2,
+   "max_winning_streak": 1
+  }
+ },
+ "exit_reasons": {
+  "trail": 46,
+  "stop": 7
+ },
+ "segment_exit_reasons": {
+  "signal_exit": 53
+ },
+ "avg_risk_pts": 617.1772946147607,
+ "avg_risk_usd": 1234.3545892295215,
+ "avg_r": 0.23806008221172353,
+ "avg_hold_days": 25.47287735849057,
+ "avg_segments_per_signal": 1.0,
+ "mae_pts_mean": -326.02358490566036,
+ "mfe_pts_mean": 783.7311320754717
+}

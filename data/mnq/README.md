@@ -29,3 +29,10 @@ Raw DBN files are not committed (about 50 MB). They decode with `scripts/decode.
     python3 scripts/decode.py <dir1> <dir2>            # OUT=... env var for parquet path
     python3 scripts/build_continuous.py raw.parquet outdir
     python3 scripts/resample.py outdir/mnq_1m_continuous.parquet out.csv x raw.parquet
+
+## Update 2026-11-21: extended to 2019-05
+A third Databento job (GLBX-20261119-NUJUXSDTE3, CSV encoding, MNQ.FUT, requested from
+2016-11-18 to 2023-09-30) was decoded with `scripts/decode_csv.py` and joined to the
+earlier jobs. MNQ began trading on 2019-05-06, so the series now starts 2019-05-05 18:00 ET.
+The overlap (2022-10-02 to 2023-09-29) matched the earlier DBN data on every candle.
+`mnq_30m_continuous.csv` and `mnq_rolls.csv` now cover 2019-05 to 2026-10.
