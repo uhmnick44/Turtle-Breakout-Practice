@@ -1,0 +1,7 @@
+{"results": "/home/user/Turtle-Breakout-Practice/results/turtle_breakout_revelio/10k_10pct", "bars": "/home/user/Turtle-Breakout-Practice/data/mnq/mnq_30m_continuous.csv", "scripts": "/home/user/Turtle-Breakout-Practice/scripts", "out": "<scratchpad>/dash10", "account": 10000, "main": "main",
+ "case": "$10,000 account, 10% of closed equity per signal, signals that need more than 10% at one contract skipped, day-trading mode, fills at the indicator's modeled levels, contracts capped by margin",
+ "costs_note": "Per contract per side: broker commission and clearing $0.63 (assumed), CME exchange fee $0.35 (Interactive Brokers pass-through rate), NFA fee $0.02, slippage 1 tick ($0.50, assumed). Rolls: positions held across a roll pay a close and a reopen. Margin: $4,021 per contract at 29,904, scaled by price.",
+ "variants": [["Main case: 10%, skip wide stops", "main"], ["10%, take 1 contract when the stop is wider", "min1"],
+   ["No day-trading schedule, 10%, skip", "pure"], ["No day-trading schedule, take 1 contract", "pure_min1"],
+   ["Alert-driven fills at candle close", "alert"], ["Higher costs: $1.50 a side plus 2 ticks", "stress"],
+   ["No costs at all", "nocost"], ["5% risk, skip", "risk5"], ["No schedule, 5% risk, skip", "pure_risk5"], ["2% risk, skip", "risk2"]]}

@@ -3,7 +3,11 @@ Sizing: contracts = floor(risk$ / (initial stop pts * $2)), decided at the break
   --policy skip : 0 contracts -> signal not traded
   --policy min1 : at least 1 contract, even when that risks more than the budget
   --compound 1  : risk$ = risk_pct of closed equity at the breakout; 0 = of starting account
-Costs: --cost_rt dollars per contract per round trip (commission + fees + slippage), applied per segment."""
+Costs: --cost_rt dollars per contract per round trip (commission + fees + slippage), applied per segment.
+Itemised costs (per contract per side): --comm_side, --fees_side, --slip_ticks (MNQ tick = $0.50).
+Rolls: --rolls <mnq_rolls.csv> charges a close-and-reopen for every roll a held position crosses.
+Margin: --margin_ref <$ per contract at --margin_ref_price>, scaled by the unadjusted price at the breakout;
+  contracts are capped at floor(equity / margin). Maintenance is taken as margin / 1.1."""
 import argparse, json, math, itertools
 import pandas as pd, numpy as np
 p = argparse.ArgumentParser()
@@ -11,6 +15,9 @@ p.add_argument("prefix"); p.add_argument("bars"); p.add_argument("--out", requir
 p.add_argument("--account", type=float, default=100000); p.add_argument("--risk_pct", type=float, default=2.0)
 p.add_argument("--compound", type=int, default=1); p.add_argument("--policy", choices=["skip","min1"], default="skip")
 p.add_argument("--cost_rt", type=float, default=0.0); p.add_argument("--pv", type=float, default=2.0)
+p.add_argument("--comm_side", type=float, default=0.0); p.add_argument("--fees_side", type=float, default=0.0)
+p.add_argument("--slip_ticks", type=float, default=0.0); p.add_argument("--tick_value", type=float, default=0.5)
+p.add_argument("--rolls", default=None); p.add_argument("--margin_ref", type=float, default=0.0); p.add_argument("--margin_ref_price", type=float, default=1.0)
 a = p.parse_args()
 sig = pd.read_csv(a.prefix + "_signals.csv"); seg = pd.read_csv(a.prefix + "_segments.csv")
 for c in ["signal_time","signal_exit_time"]: sig[c] = pd.to_datetime(sig[c], utc=True)
@@ -18,37 +25,65 @@ for c in ["signal_time","entry_time","exit_time"]: seg[c] = pd.to_datetime(seg[c
 sig = sig.sort_values("signal_time").reset_index(drop=True)
 bars = pd.read_csv(a.bars, usecols=["time_open","close_adj","open_adj","close"])
 bars["t_close"] = pd.to_datetime(bars.time_open, utc=True) + pd.Timedelta(minutes=30)
-T = bars.t_close.values; CL = bars.close_adj.values
+T = bars.t_close.values; CL = bars.close_adj.values; CU = bars.close.values
+side_cost = a.comm_side + a.fees_side + a.slip_ticks * a.tick_value
+rt_cost = a.cost_rt + 2 * side_cost
+roll_moments = []
+if a.rolls:
+    rl = pd.read_csv(a.rolls)
+    roll_moments = [(pd.Timestamp(d) - pd.Timedelta(days=1) + pd.Timedelta(hours=17)).tz_localize("America/New_York").tz_convert("UTC") for d in rl.tday]
+def rolls_crossed(sg):
+    return int(sum(((sg.entry_time < m) & (sg.exit_time > m)).sum() for m in roll_moments)) if roll_moments else 0
+def margin_at(t):
+    if a.margin_ref <= 0: return 0.0
+    i = min(np.searchsorted(T, t.to_datetime64(), side="left"), len(T) - 1)
+    return a.margin_ref * CU[i] / a.margin_ref_price
 
 eq = a.account; rows = []
 for _, s in sig.iterrows():
     base = eq if a.compound else a.account
     budget = base * a.risk_pct / 100; per_ct = s.risk_pts * a.pv
     n = math.floor(budget / per_ct)
-    if n == 0 and a.policy == "min1": n = 1
+    reason = "" if n > 0 else "risk"
+    if n == 0 and a.policy == "min1": n = 1; reason = ""
+    mreq = margin_at(s.signal_time)
+    if mreq > 0:
+        cap = math.floor(eq / mreq)
+        if n > cap:
+            n = cap
+            if n == 0: reason = "margin"
     sg = seg[seg.signal_time == s.signal_time]
+    nroll = rolls_crossed(sg)
     gross = n * (sg.exit_price - sg.entry_price).sum() * a.pv
-    cost = n * len(sg) * a.cost_rt
+    commfees = n * (len(sg) + nroll) * 2 * (a.comm_side + a.fees_side) + n * len(sg) * a.cost_rt
+    slip = n * (len(sg) + nroll) * 2 * a.slip_ticks * a.tick_value
+    cost = commfees + slip
     pnl = gross - cost
     rows.append(dict(signal_time=s.signal_time, signal_exit_time=s.signal_exit_time, contracts=n, stop_pts=s.risk_pts,
                      budget_usd=budget, risk_usd=n * per_ct, risk_pct_actual=100 * n * per_ct / eq, segments=len(sg),
-                     gross_usd=gross, cost_usd=cost, pnl_usd=pnl, r=s.r_multiple, mae_pts=s.mae, mfe_pts=s.mfe,
+                     gross_usd=gross, cost_usd=cost, commfees_usd=commfees, slippage_usd=slip, roll_trades=nroll, skip_reason=reason,
+                     margin_per_ct=mreq, pnl_usd=pnl, r=s.r_multiple, mae_pts=s.mae, mfe_pts=s.mfe,
                      hold_days=s.hold_days, exit_reason=s.exit_reason, equity_before=eq, equity_after=eq + pnl))
     eq += pnl
 tr = pd.DataFrame(rows)
 
 # ---- mark-to-market equity on every 30-minute close ----
 ncts = dict(zip(tr.signal_time, tr.contracts))
-realized = np.zeros(len(T)); openpnl = np.zeros(len(T))
+realized = np.zeros(len(T)); openpnl = np.zeros(len(T)); opencts = np.zeros(len(T))
 for _, g in seg.iterrows():
     n = ncts[g.signal_time]
     if n == 0: continue
     et, xt = g.entry_time.to_datetime64(), g.exit_time.to_datetime64()
     i0 = np.searchsorted(T, et, side="right"); i1 = np.searchsorted(T, xt, side="left")  # open at T where et < T < xt
     openpnl[i0:i1] += n * (CL[i0:i1] - g.entry_price) * a.pv
+    opencts[i0:i1] += n
     k = min(np.searchsorted(T, xt, side="left"), len(T) - 1)
-    realized[k] += n * ((g.exit_price - g.entry_price) * a.pv - a.cost_rt)
+    nroll = rolls_crossed(seg[(seg.signal_time == g.signal_time) & (seg.entry_time == g.entry_time)])
+    realized[k] += n * ((g.exit_price - g.entry_price) * a.pv - rt_cost - nroll * 2 * side_cost)
 mtm = a.account + np.cumsum(realized) + openpnl
+maint = (a.margin_ref * CU / a.margin_ref_price / 1.1) if a.margin_ref > 0 else np.zeros(len(T))
+margin_call_bars = np.where((opencts > 0) & (mtm < opencts * maint))[0]
+mc_days = sorted({str(pd.to_datetime(T[i], utc=True).tz_convert("America/New_York").date()) for i in margin_call_bars})
 peak = np.maximum.accumulate(mtm); dd = mtm - peak; ddp = dd / peak
 i_trough = int(np.argmin(ddp)); i_peak = int(np.argmax(mtm[:i_trough + 1]))
 after = np.where(mtm[i_trough:] >= mtm[i_peak])[0]
@@ -66,6 +101,12 @@ daily = eqdf.set_index("t").equity_mtm.tz_convert("America/New_York").resample("
 monthly = daily.resample("ME").last()
 
 traded = tr[tr.contracts > 0]; pnl = traded.pnl_usd.values
+if len(traded) == 0:
+    json.dump(dict(params=vars(a), signals_total=int(len(tr)), signals_traded=0, signals_skipped=int(len(tr)),
+                   skipped_risk=int((tr.skip_reason == "risk").sum()), skipped_margin=int((tr.skip_reason == "margin").sum()),
+                   smallest_risk_per_contract=float((tr.stop_pts * a.pv).min()), ending_equity=a.account, total_return_pct=0.0),
+              open(a.out + "_summary.json", "w"), indent=1, default=str)
+    tr.to_csv(a.out + "_trades.csv", index=False); print("no signals could be traded"); raise SystemExit(0)
 w, l = pnl[pnl > 0], pnl[pnl <= 0]
 streak = lambda c: max((len(list(g)) for k, g in itertools.groupby(c) if k), default=0)
 years = (T[-1] - T[0]) / np.timedelta64(365, "D") / 1.0
@@ -85,6 +126,11 @@ for y, g in tr[tr.contracts > 0].groupby("year"):
 summary = dict(
     params=vars(a), period=[str(pd.to_datetime(T[0], utc=True)), str(pd.to_datetime(T[-1], utc=True))], years=yrs,
     signals_total=int(len(tr)), signals_traded=int(len(traded)), signals_skipped=int((tr.contracts == 0).sum()),
+    skipped_risk=int((tr.skip_reason == "risk").sum()), skipped_margin=int((tr.skip_reason == "margin").sum()),
+    commfees_total=float(traded.commfees_usd.sum()), slippage_total=float(traded.slippage_usd.sum()),
+    roll_trades=int((traded.roll_trades * traded.contracts).sum()), round_trips=int((traded.segments * traded.contracts).sum()),
+    cost_per_side=float(side_cost), margin_call_days=len(mc_days), margin_call_dates=mc_days[:20],
+    min_mtm_equity=float(mtm.min()),
     skipped=[dict(t=str(r.signal_time), stop_pts=round(r.stop_pts, 1), r=round(r.r, 2)) for r in tr[tr.contracts == 0].itertuples()],
     contracts_dist=tr.contracts.value_counts().sort_index().to_dict(),
     avg_actual_risk_pct=float(traded.risk_pct_actual.mean()), max_actual_risk_pct=float(traded.risk_pct_actual.max()),
@@ -93,7 +139,7 @@ summary = dict(
     cagr_pct=float(100 * ((tr.equity_after.iloc[-1] / a.account) ** (1 / yrs) - 1)),
     win_rate=float(len(w) / len(pnl)), avg_win=float(w.mean()), avg_loss=float(l.mean()),
     payoff_ratio=float(w.mean() / -l.mean()), expectancy_usd=float(pnl.mean()), expectancy_r=float(traded.r.mean()),
-    profit_factor=float(w.sum() / -l.sum()), gross_total=float(traded.gross_usd.sum()), costs_total=float(traded.cost_usd.sum()),
+    profit_factor=float(w.sum() / -l.sum()) if len(l) and l.sum() < 0 else None, gross_total=float(traded.gross_usd.sum()), costs_total=float(traded.cost_usd.sum()),
     best_trade=float(pnl.max()), worst_trade=float(pnl.min()),
     net_without_best=float(np.sort(pnl)[:-1].sum()), net_without_best2=float(np.sort(pnl)[:-2].sum()),
     top3_share_of_net=float(np.sort(pnl)[-3:].sum() / pnl.sum()) if pnl.sum() != 0 else None,

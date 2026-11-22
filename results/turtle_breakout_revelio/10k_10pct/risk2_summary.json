@@ -1,0 +1,28 @@
+{
+ "params": {
+  "prefix": "bt_dt_level",
+  "bars": "mnq_30m_continuous.csv",
+  "out": "/tmp/claude-0/-home-user-Turtle-Breakout-Practice/1d7a5175-098f-5493-99e4-999336cfc39c/scratchpad/k10/risk2",
+  "account": 10000.0,
+  "risk_pct": 2.0,
+  "compound": 1,
+  "policy": "skip",
+  "cost_rt": 0.0,
+  "pv": 2.0,
+  "comm_side": 0.63,
+  "fees_side": 0.37,
+  "slip_ticks": 1.0,
+  "tick_value": 0.5,
+  "rolls": "/home/user/Turtle-Breakout-Practice/data/mnq/mnq_rolls.csv",
+  "margin_ref": 4021.0,
+  "margin_ref_price": 29904.25
+ },
+ "signals_total": 53,
+ "signals_traded": 0,
+ "signals_skipped": 53,
+ "skipped_risk": 53,
+ "skipped_margin": 0,
+ "smallest_risk_per_contract": 364.77128551496935,
+ "ending_equity": 10000.0,
+ "total_return_pct": 0.0
+}
