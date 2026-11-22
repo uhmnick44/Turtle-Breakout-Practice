@@ -8,7 +8,8 @@
   "compound": 1,
   "policy": "min1",
   "cost_rt": 4.0,
-  "pv": 5.0
+  "pv": 5.0,
+  "rolls": "data/es/es_rolls.csv"
  },
  "period": [
   "2016-10-23 22:30:00+00:00",
@@ -50,6 +51,8 @@
  "profit_factor": 2.029934055027427,
  "gross_total": 68239.64741563753,
  "costs_total": 31096.0,
+ "roll_costs_total": 0.0,
+ "rolls_crossed": 0,
  "best_trade": 11123.0,
  "worst_trade": -2498.25,
  "net_without_best": 26020.64741563754,

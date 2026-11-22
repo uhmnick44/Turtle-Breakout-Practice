@@ -7,6 +7,7 @@
 # MES ($5/pt, tick $1.25). MES only listed 2019-05, so pre-2019 MES results are ES prices at $5/pt.
 # Costs per contract round trip = 2 x SLIP_TICKS x tick value + fees (assumptions, not quotes):
 #   ES  $5.00 fees + 1 tick/side -> $30      MES $1.50 fees + 1 tick/side -> $4
+# Cost runs also pay one round trip per contract for each quarterly roll a held position spans.
 set -euo pipefail
 D=data/es; R=results/turtle_breakout_revelio/sp500; mkdir -p "$R"
 SLIP_TICKS=${SLIP_TICKS:-1}; ES_FEES=${ES_FEES:-5.00}; MES_FEES=${MES_FEES:-1.50}
@@ -21,6 +22,6 @@ ES_RT=$(python3 -c "print('%g' % (2*$SLIP_TICKS*12.5+$ES_FEES))"); MES_RT=$(pyth
 for c in "es 50 $ES_RT" "mes 5 $MES_RT"; do set -- $c
   for mode in dt pure; do for pol in skip min1; do for cost in 0 $3; do
     python3 scripts/report.py $R/bt_${mode}_level $B --pv $2 --risk_pct 2 --account 100000 --compound 1 \
-      --policy $pol --cost_rt $cost --out $R/rep_${1}_${mode}_${pol}_cost$cost > /dev/null
+      --policy $pol --cost_rt $cost $([ $cost != 0 ] && echo --rolls $D/es_rolls.csv) --out $R/rep_${1}_${mode}_${pol}_cost$cost > /dev/null
   done; done; done
 done

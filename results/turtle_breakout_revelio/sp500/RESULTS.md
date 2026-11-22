@@ -9,7 +9,9 @@ Backtest only. Not forward-tested, not live. Run 2026-11-22. Rules unchanged fro
   fixed at the breakout for every re-entry. Signals that cannot fit 1 contract in 2% are skipped.
 - Costs per contract round trip (assumptions): MES $4 = $1.50 fees + 1 tick ($1.25) slippage each side;
   ES $30 = $5.00 fees + 1 tick ($12.50) each side. Paid on every round trip, including day-trading
-  mode's scheduled 16:30 close and 18:00 re-entry.
+  mode's scheduled 16:30 close and 18:00 re-entry, and once more for each quarterly roll a position
+  is held through (sell expiring, buy next). Futures have no swap/overnight financing fee: carry is
+  priced into the futures and is in the back-adjusted P&L.
 - MES listed 2019-05. MES rows before that are ES prices at $5/pt (MES tracks ES; not identical fills).
 
 ## ES vs MES: the 2% rule only works on MES
@@ -26,22 +28,22 @@ Backtest only. Not forward-tested, not live. Run 2026-11-22. Rules unchanged fro
 | metric | day-trading mode (Pine default) | pure system (hold overnight) |
 |---|---|---|
 | signals | 66 | 66 |
-| ending equity | $137,144 | $161,375 |
-| return / CAGR (10.1 yr) | +37.1% / 3.2% | +61.4% / 4.9% |
+| ending equity | $137,144 | $159,529 |
+| return / CAGR (10.1 yr) | +37.1% / 3.2% | +59.5% / 4.7% |
 | win rate | 55% | 61% |
-| avg win / avg loss | $2,034 / -$1,202 | $2,504 / -$1,491 |
-| expectancy | $563 per signal | $930 per signal |
-| profit factor | 2.03 | 2.58 |
-| gross / costs | $68,240 / $31,096 | $62,803 / $1,428 |
-| round trips per signal | 22 | 1 |
-| max DD, mark-to-market | -$11,925 (-9.6%), Jan-Aug 2018 | -$11,580 (-8.7%), Jan-Aug 2018 |
+| avg win / avg loss | $2,034 / -$1,202 | $2,460 / -$1,494 |
+| expectancy | $563 per signal | $902 per signal |
+| profit factor | 2.03 | 2.53 |
+| gross / costs | $68,240 / $31,096 | $61,465 / $1,936 (incl. $512 for 20 rolls) |
+| round trips per signal | 22 (flat at every roll, so no roll cost) | 1, plus 1 per roll held |
+| max DD, mark-to-market | -$11,925 (-9.6%), Jan-Aug 2018 | -$11,592 (-8.8%), Jan-Aug 2018 |
 | longest below prior high | 1,168 days (Sep 2020 - Nov 2023) | 602 days (Nov 2021 - Jul 2023) |
 | worst losing streak | 4 | 4 |
-| best trade | +$11,123 (Nov 2017, +6.6R) | +$13,542 |
-| best 3 trades' share of net | 69% | 50% |
-| net without best two | +$18,504 | +$37,995 |
-| bootstrap 95% CI, expectancy | $9 to $1,188 (P<=0: 2.3%) | $248 to $1,692 (P<=0: 0.3%) |
-| monthly Sharpe / months positive | 0.58 / 44% | 0.84 / 51% |
+| best trade | +$11,123 (Nov 2017, +6.6R) | +$13,486 |
+| best 3 trades' share of net | 69% | 52% |
+| net without best two | +$18,504 | +$36,229 |
+| bootstrap 95% CI, expectancy | $9 to $1,188 (P<=0: 2.3%) | $232 to $1,656 (P<=0: 0.3%) |
+| monthly Sharpe / months positive | 0.58 / 44% | 0.82 / 51% |
 | exits | 59 trailing low, 7 initial stop | same |
 
 Gross R per signal (no costs): +0.48R day-trading, +0.43R pure. Median +0.21R; 3 trades above +3R.
@@ -52,21 +54,27 @@ Gross R per signal (no costs): +0.48R day-trading, +0.43R pure. Median +0.21R; 3
 | day-trading | $177,187 | +77.2% | 2.93 | -8.1% |
 | pure | $163,600 | +63.6% | 2.66 | -8.6% |
 
-Costs cut day-trading mode's net by 52% and the pure system's by 3%.
+Costs cut day-trading mode's net by 52% and the pure system's by 6% (roll costs included).
+
+## Slippage at 2 ticks per side ($6.50 per MES round trip)
+| case | end equity | return | PF |
+|---|---|---|---|
+| day-trading | $113,706 | +13.7% | 1.38 |
+| pure | $157,346 | +57.3% | 2.50 |
 
 ## By year, P&L by signal start year (MES, with costs)
 | year | signals | DT P&L | pure P&L |
 |---|---|---|---|
-| 2016 (Nov-Dec) | 1 | +$1,370 | +$1,775 |
-| 2017 | 7 | +$16,210 | +$21,103 |
-| 2018 | 5 | -$1,854 | -$773 |
-| 2019 | 6 | +$10,209 | +$12,413 |
-| 2020 | 8 | -$179 | +$3,153 |
-| 2021 | 10 | -$2,163 | -$603 |
+| 2016 (Nov-Dec) | 1 | +$1,370 | +$1,746 |
+| 2017 | 7 | +$16,210 | +$20,959 |
+| 2018 | 5 | -$1,854 | -$857 |
+| 2019 | 6 | +$10,209 | +$12,329 |
+| 2020 | 8 | -$179 | +$3,141 |
+| 2021 | 10 | -$2,163 | -$627 |
 | 2022 | 4 | +$170 | +$858 |
-| 2023 | 5 | +$9,025 | +$11,802 |
-| 2024 | 7 | +$8,072 | +$15,027 |
-| 2025 | 8 | -$5,195 | -$2,881 |
+| 2023 | 5 | +$9,025 | +$10,433 |
+| 2024 | 7 | +$8,072 | +$14,962 |
+| 2025 | 8 | -$5,195 | -$2,917 |
 | 2026 (to Nov 20) | 5 | +$1,478 | -$498 |
 
 ## Benchmark
@@ -84,6 +92,9 @@ The strategy made a fifth (DT) to a third (pure) of that, with about a quarter o
   the cheaper version. Overnight and weekend gap risk is the trade-off, and is in the drawdown above.
 - Slippage of 1 tick at the 16:30 close and the 18:00 re-entry is an assumption. Those are thinner times.
 - Win rate is not the measure here: 4 losers in a row happened in both cases.
+
+## Dashboard
+https://claude.ai/artifact/Br4kVceaMqBmDYdk4atWKR (private until shared). Data exported by `scripts/export_sp500.py`.
 
 ## Files
 `rep_<es|mes>_<dt|pure>_<skip|min1>_cost<rt>_{summary.json,trades.csv,equity_daily.csv}`, raw signals
