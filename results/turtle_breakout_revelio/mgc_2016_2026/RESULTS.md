@@ -15,8 +15,8 @@ Backtest only. Not forward-tested, not live. Run 2026-11-22.
 - Not modeled: margin requirements, margin calls, broker liquidation rules.
 
 ## The sizing problem, measured
-4% of $10k is $400. One MGC contract's initial stop cost less than that on only 20 of 60
-signals, almost all before 2020. The "min 1 contract" rule then decides the real risk:
+4% of $10k is $400. One MGC contract's initial stop cost $400 or less on only 18 of 60
+signals (42 needed more), almost all of the 18 before 2020. The "min 1 contract" rule then decides the real risk:
 
 | | main case |
 |---|---|
