@@ -1,13 +1,14 @@
 """Export the 2019-2026 sized backtest into the JSON files the report page reads.
 Each file is {rows, meta}; meta carries this script and the two scripts that made its inputs.
-Usage: python3 export_dashboard.py <results dir> <30m bars csv> <scripts dir> <out dir> [100k|10k]
-  10k: $10,000 account, 1 MNQ minimum, $2.50 per round trip main case; reads <results dir>/10k."""
+Usage: python3 export_dashboard.py <results dir> <30m bars csv> <scripts dir> <out dir> [100k|10k|50k]
+  10k / 50k: that account size, 1 MNQ minimum, $2.50 per round trip main case; reads <results dir>/<set>."""
 import sys, os, json
 import pandas as pd, numpy as np
 res, bars_csv, sdir, out = sys.argv[1:5]
 SET = sys.argv[5] if len(sys.argv) > 5 else "100k"
-ACCT = 10000 if SET == "10k" else 100000
-if SET == "10k": res = os.path.join(res, "10k")
+ACCT = {"100k": 100000, "50k": 50000, "10k": 10000}[SET]
+if SET != "100k": res = os.path.join(res, SET)
+P = "rep" + SET
 NY = "America/New_York"
 code = lambda f: open(os.path.join(sdir, f)).read()
 META = [dict(label="export_dashboard.py", value=code("export_dashboard.py"), type="code", lang="python"),
@@ -15,11 +16,11 @@ META = [dict(label="export_dashboard.py", value=code("export_dashboard.py"), typ
         dict(label="backtest.py", value=code("backtest.py"), type="code", lang="python"),
         dict(label="Data", value="Databento GLBX.MDP3 ohlcv-1m MNQ.FUT, 2019-05-05 to 2026-10-20, volume-rolled, back-adjusted, 30-minute candles"),
         dict(label="Case", value="Day-trading mode, fills at the indicator's modeled levels, 2% of closed equity per signal, signals needing more than 2% at 1 contract skipped, no costs") if SET == "100k" else
-        dict(label="Case", value="$10,000 account, day-trading mode, fills at the indicator's modeled levels, 2% of closed equity per signal with a minimum of 1 contract (every signal needed more than 2% at 1 contract), $2.50 per contract per round trip for commission, fees and slippage")]
+        dict(label="Case", value=f"${ACCT:,} account, day-trading mode, fills at the indicator's modeled levels, 2% of closed equity per signal with a minimum of 1 contract, $2.50 per contract per round trip for commission, fees and slippage")]
 def write(name, rows, extra=None):
     rows = [{k: (None if isinstance(v, float) and np.isnan(v) else v) for k, v in r.items()} for r in rows]
     json.dump(dict(rows=rows, meta=META + (extra or [])), open(os.path.join(out, name + ".json"), "w"))
-main = "rep_dt_level_c1_skip" if SET == "100k" else "rep10k_dt_level_min1_cost2.5"
+main = "rep_dt_level_c1_skip" if SET == "100k" else P + "_dt_level_min1_cost2.5"
 s = json.load(open(os.path.join(res, main + "_summary.json")))
 tr = pd.read_csv(os.path.join(res, main + "_trades.csv"))
 eq = pd.read_csv(os.path.join(res, main + "_equity_daily.csv"))
@@ -59,11 +60,15 @@ V = [("Main case", main), ("Take 1 contract when the stop exceeds 2%", "rep_dt_l
      ("No day-trading schedule", "rep_pure_level_c1_skip"), ("Alert-driven fills at candle close", "rep_dt_close_c1_skip"),
      ("Main case, $2.50 per round trip", "rep_dt_level_c1_skip_cost2.5"), ("Main case, $5.00 per round trip", "rep_dt_level_c1_skip_cost5"),
      ("No schedule, $2.50 per round trip", "rep_pure_level_c1_skip_cost2.5"), ("Alert fills, $2.50 per round trip", "rep_dt_close_c1_skip_cost2.5")]
-if SET == "10k":
-    V = [("Main case, $2.50 per round trip", main), ("No costs", "rep10k_dt_level_min1_cost0"), ("$5.00 per round trip", "rep10k_dt_level_min1_cost5"),
-         ("No day-trading schedule, no costs", "rep10k_pure_level_min1_cost0"), ("No schedule, $2.50 per round trip", "rep10k_pure_level_min1_cost2.5"),
-         ("No schedule, $5.00 per round trip", "rep10k_pure_level_min1_cost5"), ("Alert fills, no costs", "rep10k_dt_close_min1_cost0"),
-         ("Alert fills, $2.50 per round trip", "rep10k_dt_close_min1_cost2.5"), ("Alert fills, $5.00 per round trip", "rep10k_dt_close_min1_cost5")]
+if SET != "100k":
+    V = [("Main case, $2.50 per round trip", main), ("No costs", P + "_dt_level_min1_cost0"), ("$5.00 per round trip", P + "_dt_level_min1_cost5"),
+         ("No day-trading schedule, no costs", P + "_pure_level_min1_cost0"), ("No schedule, $2.50 per round trip", P + "_pure_level_min1_cost2.5"),
+         ("No schedule, $5.00 per round trip", P + "_pure_level_min1_cost5"), ("Alert fills, no costs", P + "_dt_close_min1_cost0"),
+         ("Alert fills, $2.50 per round trip", P + "_dt_close_min1_cost2.5"), ("Alert fills, $5.00 per round trip", P + "_dt_close_min1_cost5")]
+    if SET == "50k":
+        V += [("Skip signals needing more than 2%, $2.50 per round trip", P + "_dt_level_skip_cost2.5"),
+              ("Skip over 2%, no schedule, $2.50 per round trip", P + "_pure_level_skip_cost2.5"),
+              ("Skip over 2%, alert fills, $2.50 per round trip", P + "_dt_close_skip_cost2.5")]
 rows = []
 for label, f in V:
     v = json.load(open(os.path.join(res, f + "_summary.json")))
