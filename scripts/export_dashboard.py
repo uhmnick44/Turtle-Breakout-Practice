@@ -1,14 +1,15 @@
 """Export the 2019-2026 sized backtest into the JSON files the report page reads.
 Each file is {rows, meta}; meta carries this script and the two scripts that made its inputs.
-Usage: python3 export_dashboard.py <results dir> <30m bars csv> <scripts dir> <out dir> [100k|10k|50k]
-  10k / 50k: that account size, 1 MNQ minimum, $2.50 per round trip main case; reads <results dir>/<set>."""
+Usage: python3 export_dashboard.py <results dir> <30m bars csv> <scripts dir> <out dir> [100k|10k|50k|100kc]
+  10k / 50k / 100kc (the $100k account rerun with costs): that account size, 1 MNQ minimum, $2.50 per round trip main case; reads <results dir>/<set>."""
 import sys, os, json
 import pandas as pd, numpy as np
 res, bars_csv, sdir, out = sys.argv[1:5]
 SET = sys.argv[5] if len(sys.argv) > 5 else "100k"
-ACCT = {"100k": 100000, "50k": 50000, "10k": 10000}[SET]
-if SET != "100k": res = os.path.join(res, SET)
-P = "rep" + SET
+ACCT = {"100k": 100000, "100kc": 100000, "50k": 50000, "10k": 10000}[SET]
+DIR = {"100kc": "100k"}.get(SET, SET)
+if SET != "100k": res = os.path.join(res, DIR)
+P = "rep" + DIR
 NY = "America/New_York"
 code = lambda f: open(os.path.join(sdir, f)).read()
 META = [dict(label="export_dashboard.py", value=code("export_dashboard.py"), type="code", lang="python"),
@@ -65,7 +66,7 @@ if SET != "100k":
          ("No day-trading schedule, no costs", P + "_pure_level_min1_cost0"), ("No schedule, $2.50 per round trip", P + "_pure_level_min1_cost2.5"),
          ("No schedule, $5.00 per round trip", P + "_pure_level_min1_cost5"), ("Alert fills, no costs", P + "_dt_close_min1_cost0"),
          ("Alert fills, $2.50 per round trip", P + "_dt_close_min1_cost2.5"), ("Alert fills, $5.00 per round trip", P + "_dt_close_min1_cost5")]
-    if SET == "50k":
+    if SET in ("50k", "100kc"):
         V += [("Skip signals needing more than 2%, $2.50 per round trip", P + "_dt_level_skip_cost2.5"),
               ("Skip over 2%, no schedule, $2.50 per round trip", P + "_pure_level_skip_cost2.5"),
               ("Skip over 2%, alert fills, $2.50 per round trip", P + "_dt_close_skip_cost2.5")]

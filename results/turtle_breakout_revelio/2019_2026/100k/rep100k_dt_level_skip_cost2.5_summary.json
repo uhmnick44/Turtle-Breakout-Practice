@@ -1,0 +1,147 @@
+{
+ "params": {
+  "prefix": "/tmp/claude-0/-home-user-Turtle-Breakout-Practice/0f1df239-f2c6-5359-918e-6b5aeed25f4d/scratchpad/bt/bt_dt_level",
+  "bars": "data/mnq/mnq_30m_continuous.csv",
+  "out": "results/turtle_breakout_revelio/2019_2026/100k/rep100k_dt_level_skip_cost2.5",
+  "account": 100000.0,
+  "risk_pct": 2.0,
+  "compound": 1,
+  "policy": "skip",
+  "cost_rt": 2.5,
+  "pv": 2.0
+ },
+ "period": [
+  "2019-05-05 22:30:00+00:00",
+  "2026-10-21 00:00:00+00:00"
+ ],
+ "years": 7.465924657534247,
+ "signals_total": 53,
+ "signals_traded": 51,
+ "signals_skipped": 2,
+ "skipped": [
+  {
+   "t": "2025-05-01 14:30:00+00:00",
+   "stop_pts": 1360.3,
+   "r": 1.21
+  },
+  {
+   "t": "2026-08-13 13:30:00+00:00",
+   "stop_pts": 1266.0,
+   "r": -0.72
+  }
+ ],
+ "contracts_dist": {
+  "0": 2,
+  "1": 28,
+  "2": 17,
+  "3": 3,
+  "4": 1,
+  "5": 2
+ },
+ "avg_actual_risk_pct": 1.4907476849959926,
+ "max_actual_risk_pct": 1.9752934828103508,
+ "ending_equity": 120855.78599147857,
+ "net_pnl": 20855.785991478566,
+ "total_return_pct": 20.85578599147857,
+ "cagr_pct": 2.569693252451666,
+ "win_rate": 0.5490196078431373,
+ "avg_win": 1654.6964285714287,
+ "avg_loss": -1107.639739500933,
+ "payoff_ratio": 1.4938940610030675,
+ "expectancy_usd": 408.9369802250694,
+ "expectancy_r": 0.22506151723402731,
+ "profit_factor": 1.8186536394819952,
+ "gross_total": 25103.28599147854,
+ "costs_total": 4247.5,
+ "best_trade": 9689.0,
+ "worst_trade": -2201.0,
+ "net_without_best": 11166.78599147854,
+ "net_without_best2": 3635.7859914785404,
+ "top3_share_of_net": 0.9723920262840345,
+ "max_losing_streak": 4,
+ "max_winning_streak": 7,
+ "closed_trade_max_dd_usd": -8113.785029496219,
+ "mtm_max_dd_usd": -11143.285029496226,
+ "mtm_max_dd_pct": -9.169573639204973,
+ "mtm_dd_peak": "2024-07-10 22:30:00+00:00",
+ "mtm_dd_trough": "2026-04-09 18:30:00+00:00",
+ "mtm_dd_recovered": "2026-05-27 01:00:00+00:00",
+ "longest_underwater_days": 685.0833333333334,
+ "longest_underwater_from": "2024-07-10 23:00:00+00:00",
+ "longest_underwater_to": "2026-05-27 01:00:00+00:00",
+ "monthly_sharpe": 0.5532635984047626,
+ "pct_months_positive": 0.4606741573033708,
+ "worst_month_pct": -2.5839747058481577,
+ "best_month_pct": 5.262692082561893,
+ "bootstrap_expectancy_ci95": [
+  -114.99884143209896,
+  1034.3570630997299
+ ],
+ "bootstrap_p_mean_le_0": 0.07155,
+ "by_year": {
+  "2019": {
+   "signals": 4,
+   "wins": 3,
+   "pnl": 3716.5,
+   "return_pct": 4.339000000000004,
+   "max_dd_pct": -2.579423972439432
+  },
+  "2020": {
+   "signals": 8,
+   "wins": 6,
+   "pnl": 4049.6251894064735,
+   "return_pct": 4.1788067639199955,
+   "max_dd_pct": -5.01868329147841
+  },
+  "2021": {
+   "signals": 7,
+   "wins": 4,
+   "pnl": 3767.956342738922,
+   "return_pct": 3.60950467003609,
+   "max_dd_pct": -3.7672145648816824
+  },
+  "2022": {
+   "signals": 7,
+   "wins": 2,
+   "pnl": -4698.010511170636,
+   "return_pct": -5.138003273054592,
+   "max_dd_pct": -5.658583145779373
+  },
+  "2023": {
+   "signals": 6,
+   "wins": 5,
+   "pnl": 10148.5,
+   "return_pct": 10.576484039535305,
+   "max_dd_pct": -2.9117315385812192
+  },
+  "2024": {
+   "signals": 9,
+   "wins": 4,
+   "pnl": -730.5,
+   "return_pct": -1.5926617053096948,
+   "max_dd_pct": -5.209372429589587
+  },
+  "2025": {
+   "signals": 6,
+   "wins": 2,
+   "pnl": -3391.0423646971176,
+   "return_pct": -2.916923540755234,
+   "max_dd_pct": -3.8256872649979567
+  },
+  "2026": {
+   "signals": 4,
+   "wins": 2,
+   "pnl": 7992.7573352008985,
+   "return_pct": 7.08182070812815,
+   "max_dd_pct": -2.0309951736100396
+  }
+ },
+ "exit_reasons": {
+  "trail": 44,
+  "stop": 7
+ },
+ "avg_hold_days": 25.37459150326798,
+ "avg_segments": 18.84313725490196,
+ "mae_pts_mean": -315.2843137254902,
+ "mfe_pts_mean": 769.0686274509804
+}
