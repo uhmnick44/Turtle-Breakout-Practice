@@ -7,11 +7,16 @@ df["ts"] = pd.to_datetime(df.ts_event_ns, utc=True).dt.tz_convert("America/New_Y
 # Trading day = 17:00 to 17:00 ET; label by the calendar date on which the day ENDS.
 df["tday"] = (df.ts + pd.Timedelta(hours=7)).dt.normalize().dt.tz_localize(None)
 
-# Expiry order from symbol: MNQ + month letter + year digit
-mcode = {"H":3,"M":6,"U":9,"Z":12}
+# Expiry order from symbol: root + CME month letter + year.
+# 1-digit year (MNQ files): Z2=2022 .. Z9=2019. 4-digit year: from label_expiry.py (MGC).
+mcode = dict(zip("FGHJKMNQUVXZ", range(1, 13)))
+NAME = os.environ.get("NAME", "mnq")
 def key(sym):
-    m, y = sym[3], int(sym[4])
-    y += 2020 if y < 9 else 2010  # Z2=2022 .. Z9; all data is 2022-2027
+    import re
+    m, y = re.match(r"^[A-Z]+?([FGHJKMNQUVXZ])(\d+)$", sym).groups()
+    y = int(y)
+    if y < 10:
+        y += 2020 if y < 9 else 2010
     return y*100 + mcode[m]
 df["ckey"] = df.symbol.map(key)
 
@@ -59,8 +64,8 @@ assert cont.ts_event_ns.is_unique
 for c in ["open","high","low","close"]:
     cont[c+"_adj"] = cont[c] + cont.adj
 cont = cont.drop(columns=["ckey"])
-cont.to_parquet(os.path.join(outdir, "mnq_1m_continuous.parquet"), index=False)
-offs.to_csv(os.path.join(outdir, "mnq_rolls.csv"), index=False)
+cont.to_parquet(os.path.join(outdir, f"{NAME}_1m_continuous.parquet"), index=False)
+offs.to_csv(os.path.join(outdir, f"{NAME}_rolls.csv"), index=False)
 # diagnostics
 dd = cont.groupby("tday").agg(bars=("close","size"), first=("ts","min"), last=("ts","max"))
 print("days", len(dd), "bars/day median", dd.bars.median(), "min", dd.bars.min(), file=sys.stderr)

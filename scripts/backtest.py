@@ -10,7 +10,6 @@ from zoneinfo import ZoneInfo
 import pandas as pd, numpy as np
 
 NY = ZoneInfo("America/New_York")
-POINT_VALUE = 2.0  # MNQ: $2 per index point
 
 p = argparse.ArgumentParser()
 p.add_argument("csv"); p.add_argument("--out", required=True)
@@ -21,7 +20,9 @@ p.add_argument("--close", default="16:30"); p.add_argument("--open", default="18
 p.add_argument("--px", choices=["adj","raw"], default="adj")
 p.add_argument("--fill", choices=["level","close"], default="level")
 p.add_argument("--cost", type=float, default=0.0, help="$ per side per contract (commission+fees+slippage)")
+p.add_argument("--pv", type=float, default=2.0, help="$ per point per contract: MNQ 2, MGC 10")
 a = p.parse_args()
+POINT_VALUE = a.pv
 
 df = pd.read_csv(a.csv)
 sfx = "_adj" if a.px == "adj" else ""
