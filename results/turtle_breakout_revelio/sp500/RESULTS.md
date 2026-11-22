@@ -99,3 +99,45 @@ https://claude.ai/artifact/Br4kVceaMqBmDYdk4atWKR (private until shared). Data e
 ## Files
 `rep_<es|mes>_<dt|pure>_<skip|min1>_cost<rt>_{summary.json,trades.csv,equity_daily.csv}`, raw signals
 and segments in `bt_<dt|pure>_level_*`. Rebuild with `scripts/run_sp500.sh`.
+
+# $10,000 account, 10% risk per signal (MES, overnight, $4 per round trip + rolls)
+
+Same 66 signals, same rules. Files: `rep10k_*`. Dashboard: https://claude.ai/artifact/Lrb2rKHRd352oHJe784xyi
+(export: `python3 scripts/export_sp500.py results/turtle_breakout_revelio/sp500 data/es/es_30m_continuous.csv scripts <out> 10000 10 rep10k_`).
+
+| metric | value |
+|---|---|
+| ending equity | $80,299 (+703%, 23.0% a year) |
+| win rate / profit factor | 61% / 1.84 |
+| avg win / avg loss | $3,843 / -$3,209 |
+| net R per signal after costs | +0.41R, bootstrap 95% CI +0.13R to +0.73R |
+| bootstrap 95% CI, $ expectancy | -$134 to +$2,369 (compounding: late large positions dominate) |
+| max DD, mark-to-market | -$33,674 (-32.1%), Jan-Aug 2018 |
+| worst month | -14.1% |
+| longest below prior high | 603 days |
+| risk taken | 9.3% average, 10.0% max; 2 to 17 MES |
+| costs | $2,700, incl. $648 for 20 rolls |
+| hold 1 MES (~$10.7k notional) | +$19,921, max DD -36.1% |
+
+Profit factor falls from 2.53 (2%) to 1.84 here though R per trade is unchanged: dollar PF weights
+each trade by its size, and the largest positions came late, including 2025's losses.
+
+| variant ($10k, 10%) | end equity | return | PF | MTM DD |
+|---|---|---|---|---|
+| main case | $80,299 | +703% | 1.84 | -32.1% |
+| overnight, no costs | $92,710 | +827% | 1.88 | -32.3% |
+| overnight, 2 ticks slippage | $80,034 | +700% | 1.85 | -31.9% |
+| day-trading, $4 | $34,770 | +248% | 1.54 | -34.3% |
+| day-trading, no costs | $126,803 | +1,168% | 1.92 | -31.6% |
+| day-trading, 2 ticks slippage | $15,632 | +56% | 1.23 | -38.2% |
+| ES overnight, forced 1 contract (risk up to 32%) | $146,125 | +1,361% | 2.22 | -37.4% |
+
+ES with a 10% limit trades nothing on $10,000: every stop needs more than $1,000 for one contract.
+
+## Resampled drawdowns (main case net R, random order, 20,000 runs, closed trades only)
+| risk | 4 losses in a row | median worst DD | bad case (5th pct) | P(DD <= -30%) | P(DD <= -50%) |
+|---|---|---|---|---|---|
+| 1% | -3.9% | -3.0% | -5.5% | 0% | 0% |
+| 2% | -7.8% | -5.9% | -10.8% | 0% | 0% |
+| 5% | -18.5% | -14.4% | -25.3% | 1.6% | 0% |
+| 10% | -34.4% | -27.3% | -45.6% | 38.5% | 2.3% |
