@@ -15,6 +15,16 @@ for d in sys.argv[1:]:
         df["ts_event_ns"] = pd.to_datetime(df.ts_event, utc=True).astype("int64")
         frames.append(df[["ts_event_ns","symbol","instrument_id","open","high","low","close","volume"]])
         print(m.group(1), len(df), file=sys.stderr)
-out = pd.concat(frames).sort_values(["ts_event_ns","symbol"]).drop_duplicates()
+out = pd.concat(frames)
+# Contract codes repeat every 10 years (ESZ6 = Dec 2016 and Dec 2026). Each instrument_id is one
+# contract, so give it a 2-digit year: the first year >= its first traded year ending in that digit.
+first_year = pd.to_datetime(out.groupby("instrument_id").ts_event_ns.min(), utc=True).dt.year
+def full(sym, iid):
+    d, y0 = int(sym[-1]), int(first_year[iid])
+    y = y0 + (d - y0 % 10) % 10
+    return f"{sym[:-1]}{y % 100:02d}"
+names = {(s, i): full(s, i) for s, i in out[["symbol","instrument_id"]].drop_duplicates().itertuples(index=False)}
+out["symbol"] = [names[k] for k in zip(out.symbol, out.instrument_id)]
+out = out.sort_values(["ts_event_ns","symbol"]).drop_duplicates()
 out.to_parquet(os.environ["OUT"], index=False)
 print(len(out), pd.to_datetime(out.ts_event_ns.min(), utc=True), pd.to_datetime(out.ts_event_ns.max(), utc=True), file=sys.stderr)

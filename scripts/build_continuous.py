@@ -4,16 +4,22 @@ import pandas as pd, numpy as np
 src, outdir = sys.argv[1], sys.argv[2]
 df = pd.read_parquet(src)
 df["ts"] = pd.to_datetime(df.ts_event_ns, utc=True).dt.tz_convert("America/New_York")
+# DROP_HALT=1: drop prints stamped in the 17:00-17:59 ET daily halt. ES has stray single 17:00
+# prints (mostly settlement-time); on a Friday each one would become a fake one-bar Saturday session.
+if os.environ.get("DROP_HALT") == "1":
+    halt = df.ts.dt.hour == 17
+    print("dropped halt-hour prints:", int(halt.sum()), file=sys.stderr)
+    df = df[~halt].copy()
 # Trading day = 17:00 to 17:00 ET; label by the calendar date on which the day ENDS.
 df["tday"] = (df.ts + pd.Timedelta(hours=7)).dt.normalize().dt.tz_localize(None)
 
 # Expiry order from symbol: root (MNQ, MES, ES, NQ) + month letter + year digit
 import re
 mcode = {"H":3,"M":6,"U":9,"Z":12}
-ROOT = re.match(r"^([A-Z]+?)[HMUZ]\d$", df.symbol.iloc[0]).group(1)
+ROOT = re.match(r"^([A-Z]+?)[HMUZ]\d{1,2}$", df.symbol.iloc[0]).group(1)
 def key(sym):
-    m, y = sym[-2], int(sym[-1])
-    y += 2020 if y < 9 else 2010  # 9 = 2019, 0-8 = 2020-2028
+    m, y = re.match(r"^[A-Z]+?([HMUZ])(\d{1,2})$", sym).groups()
+    y = 2000 + int(y) if len(y) == 2 else int(y) + (2020 if int(y) < 9 else 2010)  # 1-digit: 9 = 2019, 0-8 = 2020-2028
     return y*100 + mcode[m]
 df["ckey"] = df.symbol.map(key)
 

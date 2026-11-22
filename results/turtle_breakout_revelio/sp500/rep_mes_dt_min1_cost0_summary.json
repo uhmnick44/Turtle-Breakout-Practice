@@ -1,0 +1,164 @@
+{
+ "params": {
+  "prefix": "results/turtle_breakout_revelio/sp500/bt_dt_level",
+  "bars": "data/es/es_30m_continuous.csv",
+  "out": "results/turtle_breakout_revelio/sp500/rep_mes_dt_min1_cost0",
+  "account": 100000.0,
+  "risk_pct": 2.0,
+  "compound": 1,
+  "policy": "min1",
+  "cost_rt": 0.0,
+  "pv": 5.0
+ },
+ "period": [
+  "2016-10-23 22:30:00+00:00",
+  "2026-11-20 22:00:00+00:00"
+ ],
+ "years": 10.082134703196347,
+ "signals_total": 66,
+ "signals_traded": 66,
+ "signals_skipped": 0,
+ "skipped": [],
+ "contracts_dist": {
+  "2": 4,
+  "3": 5,
+  "4": 20,
+  "5": 11,
+  "6": 6,
+  "7": 7,
+  "8": 3,
+  "10": 2,
+  "11": 3,
+  "12": 1,
+  "13": 2,
+  "15": 1,
+  "18": 1
+ },
+ "avg_actual_risk_pct": 1.8319807376073318,
+ "max_actual_risk_pct": 1.9901670733249435,
+ "ending_equity": 177186.68605366134,
+ "net_pnl": 77186.68605366134,
+ "total_return_pct": 77.18668605366135,
+ "cagr_pct": 5.837780238287871,
+ "win_rate": 0.6666666666666666,
+ "avg_win": 2663.2102272727275,
+ "avg_loss": -1817.9347248335753,
+ "payoff_ratio": 1.464964715670159,
+ "expectancy_usd": 1169.495243237293,
+ "expectancy_r": 0.48463146401673063,
+ "profit_factor": 2.929929431340318,
+ "gross_total": 77186.68605366134,
+ "costs_total": 0.0,
+ "best_trade": 15037.5,
+ "worst_trade": -3676.449137370605,
+ "net_without_best": 62149.186053661346,
+ "net_without_best2": 50940.436053661346,
+ "top3_share_of_net": 0.4417698406729632,
+ "max_losing_streak": 4,
+ "max_winning_streak": 10,
+ "closed_trade_max_dd_usd": -8536.489532700609,
+ "mtm_max_dd_usd": -12637.5,
+ "mtm_max_dd_pct": -8.14967344645792,
+ "mtm_dd_peak": "2018-01-29 01:30:00+00:00",
+ "mtm_dd_trough": "2018-08-15 15:00:00+00:00",
+ "mtm_dd_recovered": "2019-04-02 00:00:00+00:00",
+ "longest_underwater_days": 596.9375,
+ "longest_underwater_from": "2021-11-22 16:00:00+00:00",
+ "longest_underwater_to": "2023-07-12 14:30:00+00:00",
+ "monthly_sharpe": 0.9573080493074612,
+ "pct_months_positive": 0.5206611570247934,
+ "worst_month_pct": -3.3823149382685047,
+ "best_month_pct": 10.919879461927984,
+ "bootstrap_expectancy_ci95": [
+  414.4508113642203,
+  2016.1413214618294
+ ],
+ "bootstrap_p_mean_le_0": 0.00115,
+ "by_year": {
+  "2016": {
+   "signals": 1,
+   "wins": 1,
+   "pnl": 2126.25,
+   "return_pct": 2.126249999999996,
+   "max_dd_pct": -0.7820754144149622
+  },
+  "2017": {
+   "signals": 7,
+   "wins": 7,
+   "pnl": 28126.25,
+   "return_pct": 18.195615720737823,
+   "max_dd_pct": -2.1320624568884394
+  },
+  "2018": {
+   "signals": 5,
+   "wins": 3,
+   "pnl": 1456.412019143761,
+   "return_pct": 9.112978155389516,
+   "max_dd_pct": -7.180832244467917
+  },
+  "2019": {
+   "signals": 6,
+   "wins": 6,
+   "pnl": 16355.0,
+   "return_pct": 12.970838296437304,
+   "max_dd_pct": -1.8605514186853633
+  },
+  "2020": {
+   "signals": 8,
+   "wins": 5,
+   "pnl": 2961.25,
+   "return_pct": 1.7398371430890291,
+   "max_dd_pct": -3.5679683974502607
+  },
+  "2021": {
+   "signals": 10,
+   "wins": 5,
+   "pnl": 173.13908154013916,
+   "return_pct": 1.312505316893775,
+   "max_dd_pct": -3.155070175200869
+  },
+  "2022": {
+   "signals": 4,
+   "wins": 3,
+   "pnl": 1387.1597590546116,
+   "return_pct": -0.5104315789684954,
+   "max_dd_pct": -3.3823149382685047
+  },
+  "2023": {
+   "signals": 5,
+   "wins": 4,
+   "pnl": 13893.75,
+   "return_pct": 10.391717474691497,
+   "max_dd_pct": -3.646508005465121
+  },
+  "2024": {
+   "signals": 7,
+   "wins": 5,
+   "pnl": 14917.5,
+   "return_pct": 7.691087874776836,
+   "max_dd_pct": -3.1979370397579254
+  },
+  "2025": {
+   "signals": 8,
+   "wins": 3,
+   "pnl": -4539.785273376551,
+   "return_pct": -2.9381928967266213,
+   "max_dd_pct": -5.64634013697356
+  },
+  "2026": {
+   "signals": 5,
+   "wins": 2,
+   "pnl": 329.7604672993839,
+   "return_pct": 0.6359856989438528,
+   "max_dd_pct": -3.5209075002812007
+  }
+ },
+ "exit_reasons": {
+  "trail": 59,
+  "stop": 7
+ },
+ "avg_hold_days": 29.695075757575754,
+ "avg_segments": 22.060606060606062,
+ "mae_pts_mean": -55.08712121212121,
+ "mfe_pts_mean": 148.58333333333334
+}
