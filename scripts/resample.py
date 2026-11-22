@@ -2,8 +2,9 @@ import sys, pandas as pd
 src, out30, out_sanity = sys.argv[1:4]
 raw = pd.read_parquet(sys.argv[4]); raw["ts"] = pd.to_datetime(raw.ts_event_ns, utc=True).dt.tz_convert("America/New_York")
 raw["tday"] = (raw.ts + pd.Timedelta(hours=7)).dt.normalize().dt.tz_localize(None)
-v = raw[(raw.tday >= "2022-12-06") & (raw.tday <= "2022-12-16") & raw.symbol.isin(["MNQZ2","MNQH3"])].groupby(["tday","symbol"]).volume.sum().unstack()
-print(v.to_string())
+# Volume around the Dec 2022 roll, a quick check of the roll rule (any root).
+v = raw[(raw.tday >= "2022-12-06") & (raw.tday <= "2022-12-16") & raw.symbol.str.contains(r"[ZH][23]$")].groupby(["tday","symbol"]).volume.sum().unstack()
+if len(v): print(v.to_string())
 c = pd.read_parquet(src)
 c["ts"] = pd.to_datetime(c.ts_event_ns, utc=True).dt.tz_convert("America/New_York")
 c = c.set_index("ts")
