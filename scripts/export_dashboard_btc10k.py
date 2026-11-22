@@ -1,23 +1,24 @@
 """Export the $10,000 BTC/MBT risk-choice backtest into the JSON files the report page reads.
-Main case 4% per signal; the risk table carries every grid level and the Monte Carlo results.
+Main case risk per signal from argv (default 4), compared with a second level (default 3); the risk table carries every grid level and the Monte Carlo results.
 Each file is {rows, meta}; meta carries this script and the scripts that made its inputs.
-Usage: python3 export_dashboard_btc10k.py <10k results dir> <signals csv> <30m bars csv> <scripts dir> <out dir>"""
+Usage: python3 export_dashboard_btc10k.py <10k results dir> <signals csv> <30m bars csv> <scripts dir> <out dir> [main risk] [compare risk]"""
 import sys, os, json
 import pandas as pd, numpy as np
 res, sig_csv, bars_csv, sdir, out = sys.argv[1:6]
-NY = "America/New_York"; PV = 0.1; START = 10000; MAIN = "4"
+MAIN = sys.argv[6] if len(sys.argv) > 6 else "4"; CMP = sys.argv[7] if len(sys.argv) > 7 else "3"
+NY = "America/New_York"; PV = 0.1; START = 10000
 code = lambda f: open(os.path.join(sdir, f)).read()
 META = [dict(label="export_dashboard_btc10k.py", value=code("export_dashboard_btc10k.py"), type="code", lang="python"),
         dict(label="report.py", value=code("report.py"), type="code", lang="python"),
         dict(label="mc_risk.py", value=code("mc_risk.py"), type="code", lang="python"),
         dict(label="backtest.py", value=code("backtest.py"), type="code", lang="python"),
         dict(label="Data", value="Databento GLBX.MDP3 ohlcv-1m BTC.FUT, 2017-12-17 to 2026-11-20, calendar roll 5 trading days before expiry, back-adjusted, 30-minute candles, classic CME hours"),
-        dict(label="Case", value="$10,000, 4% of closed equity per signal, day-trading mode off, fills at the indicator's modeled levels, Micro Bitcoin sizing (0.1 BTC, $0.10 per point), $7 per contract per round trip assumed costs")]
+        dict(label="Case", value=f"$10,000, {MAIN}% of closed equity per signal, day-trading mode off, fills at the indicator's modeled levels, Micro Bitcoin sizing (0.1 BTC, $0.10 per point), $7 per contract per round trip assumed costs")]
 def write(name, rows, extra=None):
     rows = [{k: (None if isinstance(v, float) and np.isnan(v) else v) for k, v in r.items()} for r in rows]
     json.dump(dict(rows=rows, meta=META + (extra or [])), open(os.path.join(out, name + ".json"), "w"))
 rep = lambda r: os.path.join(res, f"rep_mbt_pure_level_cost7_risk{r}")
-s = json.load(open(rep(MAIN) + "_summary.json")); s3 = json.load(open(rep("3") + "_summary.json")); s2 = json.load(open(rep("2") + "_summary.json"))
+s = json.load(open(rep(MAIN) + "_summary.json")); s3 = json.load(open(rep(CMP) + "_summary.json")); s2 = json.load(open(rep("2") + "_summary.json"))
 tr = pd.read_csv(rep(MAIN) + "_trades.csv"); eq = pd.read_csv(rep(MAIN) + "_equity_daily.csv")
 eq["t"] = pd.to_datetime(eq.iloc[:, 0], utc=True).dt.tz_convert(NY)
 b = pd.read_csv(bars_csv, usecols=["time_open", "close_adj", "close"])
@@ -44,7 +45,12 @@ write("metrics", [dict(
     ci_low=round(s["bootstrap_expectancy_ci95"][0]), ci_high=round(s["bootstrap_expectancy_ci95"][1]), p_le_0_pct=round(100 * s["bootstrap_p_mean_le_0"], 1),
     avg_risk_pct=round(s["avg_actual_risk_pct"], 2), max_risk_pct=round(s["max_actual_risk_pct"], 2), months_positive_pct=round(100 * s["pct_months_positive"]),
     costs=round(s["costs_total"]), contracts_min=int(tr.contracts.min()), contracts_max=int(tr.contracts.max()),
-    worst_trade_pct=round(float(100 * (tr.pnl_usd / tr.equity_before).min()), 1),
+    worst_trade_pct=round(float(100 * (tr.pnl_usd / tr.equity_before).min()), 1), main_risk=float(MAIN), cmp_risk=float(CMP),
+    dd_recovered="no" if s["mtm_dd_recovered"] is None else "yes", dd_peak=s["mtm_dd_peak"][:10], dd_trough=s["mtm_dd_trough"][:10],
+    wo5_p_loss_pct=round(100 * mc["results"]["without the best 5"][str(float(MAIN))]["p_loss"], 1),
+    wo5_p_dd50_pct=round(100 * mc["results"]["without the best 5"][str(float(MAIN))]["p_dd_50"], 1),
+    wo5_median_end=round(mc["results"]["without the best 5"][str(float(MAIN))]["median_end"]),
+    all_p_dd50_pct=round(100 * mc["results"]["all signals"][str(float(MAIN))]["p_dd_50"], 1),
     bh_contracts=n_bh, bh_pnl=round(bh.iloc[-1] - START), bh_dd_pct=round(100 * (bh / bh.cummax() - 1).min(), 1),
     r3_ending_equity=round(s3["ending_equity"]), r3_cagr_pct=round(s3["cagr_pct"], 1), r3_dd_pct=round(s3["mtm_max_dd_pct"], 1), r3_traded=s3["signals_traded"],
     r2_traded=s2["signals_traded"], r2_skipped=s2["signals_skipped"],
