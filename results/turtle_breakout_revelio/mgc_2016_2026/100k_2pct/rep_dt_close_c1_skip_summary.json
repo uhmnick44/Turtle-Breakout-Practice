@@ -1,0 +1,165 @@
+{
+ "params": {
+  "prefix": "results/turtle_breakout_revelio/mgc_2016_2026/bt_dt_close",
+  "bars": "data/mgc/mgc_30m_continuous.csv",
+  "out": "results/turtle_breakout_revelio/mgc_2016_2026/100k_2pct/rep_dt_close_c1_skip",
+  "account": 100000.0,
+  "risk_pct": 2.0,
+  "compound": 1,
+  "policy": "skip",
+  "cost_rt": 0.0,
+  "pv": 10.0
+ },
+ "period": [
+  "2016-10-23 22:30:00+00:00",
+  "2026-11-20 22:00:00+00:00"
+ ],
+ "years": 10.082134703196347,
+ "signals_total": 60,
+ "signals_traded": 58,
+ "signals_skipped": 2,
+ "skipped": [
+  {
+   "t": "2026-03-01 23:00:00+00:00",
+   "stop_pts": 318.6,
+   "r": -1.02
+  },
+  {
+   "t": "2026-04-17 13:00:00+00:00",
+   "stop_pts": 307.1,
+   "r": -0.49
+  }
+ ],
+ "contracts_dist": {
+  "0": 2,
+  "1": 8,
+  "2": 7,
+  "3": 11,
+  "4": 12,
+  "5": 2,
+  "6": 3,
+  "7": 3,
+  "8": 6,
+  "9": 6
+ },
+ "avg_actual_risk_pct": 1.7366923004504973,
+ "max_actual_risk_pct": 1.984017958352539,
+ "ending_equity": 109311.00000000003,
+ "net_pnl": 9311.00000000003,
+ "total_return_pct": 9.311000000000025,
+ "cagr_pct": 0.8869259065762414,
+ "win_rate": 0.41379310344827586,
+ "avg_win": 2310.125000000008,
+ "avg_loss": -1356.8235294117694,
+ "payoff_ratio": 1.7025979797103963,
+ "expectancy_usd": 160.53448275862112,
+ "expectancy_r": 0.09039721537166734,
+ "profit_factor": 1.201833868030868,
+ "gross_total": 9311.000000000025,
+ "costs_total": 0.0,
+ "best_trade": 8100.000000000123,
+ "worst_trade": -3024.0000000000146,
+ "net_without_best": 1210.9999999999036,
+ "net_without_best2": -6267.000000000107,
+ "top3_share_of_net": 2.3548491032112686,
+ "max_losing_streak": 6,
+ "max_winning_streak": 3,
+ "closed_trade_max_dd_usd": -14184.000000000065,
+ "mtm_max_dd_usd": -20035.00000000006,
+ "mtm_max_dd_pct": -17.888712298433955,
+ "mtm_dd_peak": "2020-01-08 00:30:00+00:00",
+ "mtm_dd_trough": "2022-11-09 20:00:00+00:00",
+ "mtm_dd_recovered": "2025-10-13 14:30:00+00:00",
+ "longest_underwater_days": 2105.5625,
+ "longest_underwater_from": "2020-01-08 01:00:00+00:00",
+ "longest_underwater_to": "2025-10-13 14:30:00+00:00",
+ "monthly_sharpe": 0.16545048578377827,
+ "pct_months_positive": 0.2975206611570248,
+ "worst_month_pct": -4.957088031361934,
+ "best_month_pct": 9.19517805068395,
+ "bootstrap_expectancy_ci95": [
+  -430.3142241379335,
+  811.5689655172487
+ ],
+ "bootstrap_p_mean_le_0": 0.31795,
+ "by_year": {
+  "2017": {
+   "signals": 7,
+   "wins": 5,
+   "pnl": 4980.00000000005,
+   "return_pct": 2.5770000000000737,
+   "max_dd_pct": -3.7691668555026925
+  },
+  "2018": {
+   "signals": 5,
+   "wins": 1,
+   "pnl": -3884.000000000028,
+   "return_pct": -0.4221219181688274,
+   "max_dd_pct": -8.213626626357417
+  },
+  "2019": {
+   "signals": 6,
+   "wins": 4,
+   "pnl": 5140.999999999999,
+   "return_pct": 5.857416979949837,
+   "max_dd_pct": -5.6858785148361735
+  },
+  "2020": {
+   "signals": 6,
+   "wins": 1,
+   "pnl": -6385.000000000064,
+   "return_pct": -5.902318569829945,
+   "max_dd_pct": -8.896198962531876
+  },
+  "2021": {
+   "signals": 6,
+   "wins": 2,
+   "pnl": -1633.9999999999645,
+   "return_pct": -1.7406260749913915,
+   "max_dd_pct": -5.694082620022334
+  },
+  "2022": {
+   "signals": 6,
+   "wins": 1,
+   "pnl": -1491.0000000000446,
+   "return_pct": -4.625202552663721,
+   "max_dd_pct": -9.481292098923255
+  },
+  "2023": {
+   "signals": 5,
+   "wins": 1,
+   "pnl": -1625.0000000000136,
+   "return_pct": -0.26009438909283533,
+   "max_dd_pct": -8.123774284858653
+  },
+  "2024": {
+   "signals": 7,
+   "wins": 3,
+   "pnl": 3770.000000000068,
+   "return_pct": 3.9641647914871125,
+   "max_dd_pct": -6.344907539388367
+  },
+  "2025": {
+   "signals": 8,
+   "wins": 4,
+   "pnl": 8807.000000000044,
+   "return_pct": 8.907476333036701,
+   "max_dd_pct": -7.558044226637772
+  },
+  "2026": {
+   "signals": 2,
+   "wins": 2,
+   "pnl": 1631.99999999998,
+   "return_pct": 1.5156158582453338,
+   "max_dd_pct": -6.15248365502331
+  }
+ },
+ "exit_reasons": {
+  "trail": 49,
+  "stop": 9
+ },
+ "avg_hold_days": 23.501436781609197,
+ "avg_segments": 17.32758620689655,
+ "mae_pts_mean": -31.012068965517223,
+ "mfe_pts_mean": 118.9086206896552
+}
